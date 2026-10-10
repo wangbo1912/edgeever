@@ -15,7 +15,6 @@ export type DesktopAcpAdapter = {
   version?: string;
   managed?: boolean;
   updateError?: string;
-  customPath?: string;
   authMethods?: Array<{ id: string; name: string }>;
 };
 
@@ -32,12 +31,9 @@ export const displayedDesktopAcpAdapter = ({
 }): DesktopAcpAdapter | undefined => {
   const current = listed.find((adapter) => adapter.id === id);
   const checked = probed?.id === id ? probed : undefined;
-  if (id === "antigravity" && path.trim()) {
-    return current?.customPath === path.trim() ? current : checked;
-  }
-  if (current?.customPath) return checked;
+  if (id === "antigravity" && path.trim()) return checked;
   if (current?.state === "installing" || (current?.managed && (!checked?.managed || current.version !== checked.version))) return current;
-  if (checked?.state === "available" && (current?.state === "needs_login" || current?.state === "failed" || current?.state === "not_installed")) return current;
+  if (current?.state === "needs_login" && checked?.state === "available") return current;
   return checked ?? current;
 };
 
